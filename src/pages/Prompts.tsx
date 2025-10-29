@@ -28,7 +28,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Plus, Search, MoreVertical, Edit, History, TestTube, Copy } from "lucide-react";
+import { Plus, Search, MoreVertical, Edit, History } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -202,7 +202,10 @@ export default function Prompts() {
                     <TableCell>{prompt.creator}</TableCell>
                     <TableCell>{prompt.lastModified}</TableCell>
                     <TableCell>
-                      <Badge variant={prompt.status === "published" ? "default" : "secondary"}>
+                      <Badge 
+                        variant={prompt.status === "published" ? "default" : "secondary"}
+                        className={prompt.status === "published" ? "bg-green-600 hover:bg-green-700" : "bg-muted text-muted-foreground hover:bg-muted"}
+                      >
                         {prompt.status === "published" ? "Publicado" : "Rascunho"}
                       </Badge>
                     </TableCell>
@@ -221,14 +224,6 @@ export default function Prompts() {
                           <DropdownMenuItem onClick={() => handleViewHistory(prompt)}>
                             <History className="h-4 w-4 mr-2" />
                             Histórico
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log("Test", prompt.id)}>
-                            <TestTube className="h-4 w-4 mr-2" />
-                            Testar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log("Duplicate", prompt.id)}>
-                            <Copy className="h-4 w-4 mr-2" />
-                            Duplicar
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
