@@ -36,9 +36,11 @@ export function CreatePromptDialog({ open, onOpenChange }: CreatePromptDialogPro
   const [mainObjective, setMainObjective] = useState("");
   const [toneOfVoice, setToneOfVoice] = useState("");
   const [forbiddenPatterns, setForbiddenPatterns] = useState("");
+  const [refinementInstructions, setRefinementInstructions] = useState("");
+  const [isGenerated, setIsGenerated] = useState(false);
 
   const handleGeneratePrompt = () => {
-    const generatedPrompt = `Você é ${agentName}, ${agentRole}.
+    let generatedPrompt = `Você é ${agentName}, ${agentRole}.
 
 Público-alvo: ${targetAudience}
 
@@ -50,7 +52,24 @@ ${forbiddenPatterns ? `Padrões proibidos:\n${forbiddenPatterns}` : ''}
 
 Siga estas diretrizes em todas as suas interações.`;
 
+    if (refinementInstructions && isGenerated) {
+      generatedPrompt += `\n\nInstruções adicionais:\n${refinementInstructions}`;
+    }
+
     setSystemPrompt(generatedPrompt);
+    setIsGenerated(true);
+  };
+
+  const handleStartOver = () => {
+    setAgentName("");
+    setAgentRole("");
+    setTargetAudience("");
+    setMainObjective("");
+    setToneOfVoice("");
+    setForbiddenPatterns("");
+    setRefinementInstructions("");
+    setSystemPrompt("");
+    setIsGenerated(false);
   };
 
   const handleSave = () => {
@@ -175,23 +194,58 @@ Siga estas diretrizes em todas as suas interações.`;
                 />
               </div>
 
-              <Button
-                onClick={handleGeneratePrompt}
-                className="w-full"
-                variant="secondary"
-              >
-                <Wand2 className="w-4 h-4 mr-2" />
-                Gerar System Prompt
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleGeneratePrompt}
+                  className="flex-1"
+                  variant="secondary"
+                  disabled={!agentName || !agentRole}
+                >
+                  <Wand2 className="w-4 h-4 mr-2" />
+                  {isGenerated ? "Regenerar Prompt" : "Gerar System Prompt"}
+                </Button>
+                {isGenerated && (
+                  <Button
+                    onClick={handleStartOver}
+                    variant="outline"
+                  >
+                    Começar do Zero
+                  </Button>
+                )}
+              </div>
 
               {systemPrompt && (
-                <div className="space-y-2">
-                  <Label>Prompt Gerado</Label>
-                  <Textarea
-                    value={systemPrompt}
-                    onChange={(e) => setSystemPrompt(e.target.value)}
-                    className="min-h-[400px] font-mono text-sm"
-                  />
+                <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                  <div className="space-y-2">
+                    <Label>Prompt Gerado</Label>
+                    <Textarea
+                      value={systemPrompt}
+                      onChange={(e) => setSystemPrompt(e.target.value)}
+                      className="min-h-[400px] font-mono text-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="refinement">
+                      Instruções Adicionais (opcional)
+                    </Label>
+                    <Textarea
+                      id="refinement"
+                      placeholder="Ex: Adicione mais empatia nas respostas, seja mais direto, inclua exemplos práticos..."
+                      value={refinementInstructions}
+                      onChange={(e) => setRefinementInstructions(e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                    <Button
+                      onClick={handleGeneratePrompt}
+                      size="sm"
+                      variant="secondary"
+                      disabled={!refinementInstructions}
+                    >
+                      <Wand2 className="w-4 h-4 mr-2" />
+                      Aplicar Refinamento
+                    </Button>
+                  </div>
                 </div>
               )}
             </TabsContent>
