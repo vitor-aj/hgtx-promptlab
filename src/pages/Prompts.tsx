@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { PromptCard } from "@/components/prompts/PromptCard";
+import { CreatePromptDialog } from "@/components/prompts/CreatePromptDialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function Prompts() {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [prompts] = useState([
     {
       id: 1,
@@ -44,7 +46,7 @@ export default function Prompts() {
             Crie, edite e gerencie os prompts dos seus agentes de IA
           </p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4" />
           Criar Prompt
         </Button>
@@ -65,6 +67,11 @@ export default function Prompts() {
           />
         ))}
       </div>
+
+      <CreatePromptDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </div>
   );
 }
