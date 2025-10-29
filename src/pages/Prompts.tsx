@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { CreatePromptDialog } from "@/components/prompts/CreatePromptDialog";
 import { EditPromptDialog } from "@/components/prompts/EditPromptDialog";
+import { PromptHistoryDialog } from "@/components/prompts/PromptHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +35,7 @@ const ITEMS_PER_PAGE = 10;
 export default function Prompts() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -131,6 +133,15 @@ export default function Prompts() {
     setIsEditDialogOpen(true);
   };
 
+  const handleViewHistory = (prompt: any) => {
+    setSelectedPrompt({
+      id: prompt.id,
+      title: prompt.title,
+      currentVersion: prompt.version,
+    });
+    setIsHistoryDialogOpen(true);
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
@@ -207,7 +218,7 @@ export default function Prompts() {
                             <Edit className="h-4 w-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log("History", prompt.id)}>
+                          <DropdownMenuItem onClick={() => handleViewHistory(prompt)}>
                             <History className="h-4 w-4 mr-2" />
                             Histórico
                           </DropdownMenuItem>
@@ -291,6 +302,12 @@ export default function Prompts() {
       <EditPromptDialog
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
+        prompt={selectedPrompt}
+      />
+
+      <PromptHistoryDialog
+        open={isHistoryDialogOpen}
+        onOpenChange={setIsHistoryDialogOpen}
         prompt={selectedPrompt}
       />
     </div>
