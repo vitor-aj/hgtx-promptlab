@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
+  Bot,
   FileText,
   TestTube,
   ArrowLeft,
@@ -12,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "./ThemeToggle";
 
 const menuItems = [
+  { title: "Agentes", url: "/agents", icon: Bot },
   { title: "Prompts", url: "/", icon: FileText },
   { title: "Testar Prompt", url: "/test", icon: TestTube },
 ];
