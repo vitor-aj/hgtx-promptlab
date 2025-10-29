@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import {
   FileText,
   TestTube,
-  History,
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
@@ -15,7 +14,6 @@ import { ThemeToggle } from "./ThemeToggle";
 const menuItems = [
   { title: "Prompts", url: "/", icon: FileText },
   { title: "Testar Prompt", url: "/test", icon: TestTube },
-  { title: "Histórico", url: "/history", icon: History },
 ];
 
 export function AppSidebar() {
