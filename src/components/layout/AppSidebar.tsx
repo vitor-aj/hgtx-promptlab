@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  Bot,
   FileText,
   TestTube,
   History,
-  Link,
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
@@ -15,11 +13,9 @@ import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "./ThemeToggle";
 
 const menuItems = [
-  { title: "Agentes", url: "/", icon: Bot },
-  { title: "Prompts", url: "/prompts", icon: FileText },
+  { title: "Prompts", url: "/", icon: FileText },
   { title: "Testar Prompt", url: "/test", icon: TestTube },
   { title: "Histórico", url: "/history", icon: History },
-  { title: "Vincular", url: "/link", icon: Link },
 ];
 
 export function AppSidebar() {
