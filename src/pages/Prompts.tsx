@@ -1,9 +1,23 @@
 import { useState, useMemo } from "react";
-import { PromptCard } from "@/components/prompts/PromptCard";
 import { CreatePromptDialog } from "@/components/prompts/CreatePromptDialog";
 import { EditPromptDialog } from "@/components/prompts/EditPromptDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Pagination,
   PaginationContent,
@@ -13,9 +27,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, MoreVertical, Edit, History, TestTube, Copy } from "lucide-react";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 
 export default function Prompts() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -153,20 +167,65 @@ export default function Prompts() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedPrompts.map((prompt) => (
-              <PromptCard
-                key={prompt.id}
-                title={prompt.title}
-                creator={prompt.creator}
-                lastModified={prompt.lastModified}
-                status={prompt.status}
-                onEdit={() => handleEditPrompt(prompt)}
-                onHistory={() => console.log("History", prompt.id)}
-                onTest={() => console.log("Test", prompt.id)}
-                onDuplicate={() => console.log("Duplicate", prompt.id)}
-              />
-            ))}
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Versão</TableHead>
+                  <TableHead>Criador</TableHead>
+                  <TableHead>Última Modificação</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedPrompts.map((prompt) => (
+                  <TableRow key={prompt.id}>
+                    <TableCell className="font-medium">{prompt.title}</TableCell>
+                    <TableCell>
+                      <code className="text-xs bg-muted px-2 py-1 rounded">
+                        {prompt.version}
+                      </code>
+                    </TableCell>
+                    <TableCell>{prompt.creator}</TableCell>
+                    <TableCell>{prompt.lastModified}</TableCell>
+                    <TableCell>
+                      <Badge variant={prompt.status === "published" ? "default" : "secondary"}>
+                        {prompt.status === "published" ? "Publicado" : "Rascunho"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditPrompt(prompt)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log("History", prompt.id)}>
+                            <History className="h-4 w-4 mr-2" />
+                            Histórico
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log("Test", prompt.id)}>
+                            <TestTube className="h-4 w-4 mr-2" />
+                            Testar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log("Duplicate", prompt.id)}>
+                            <Copy className="h-4 w-4 mr-2" />
+                            Duplicar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
 
           {totalPages > 1 && (
