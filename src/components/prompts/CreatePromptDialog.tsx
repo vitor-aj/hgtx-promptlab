@@ -61,7 +61,7 @@ Siga estas diretrizes em todas as suas interações.`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Criar Novo Prompt</DialogTitle>
           <DialogDescription>
@@ -97,7 +97,7 @@ Siga estas diretrizes em todas as suas interações.`;
                   placeholder="Digite o system prompt..."
                   value={systemPrompt}
                   onChange={(e) => setSystemPrompt(e.target.value)}
-                  className="min-h-[300px] font-mono"
+                  className="min-h-[400px] font-mono text-sm"
                 />
               </div>
             </TabsContent>
@@ -190,7 +190,7 @@ Siga estas diretrizes em todas as suas interações.`;
                   <Textarea
                     value={systemPrompt}
                     onChange={(e) => setSystemPrompt(e.target.value)}
-                    className="min-h-[200px] font-mono"
+                    className="min-h-[400px] font-mono text-sm"
                   />
                 </div>
               )}
