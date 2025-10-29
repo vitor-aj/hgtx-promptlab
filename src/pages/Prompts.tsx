@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { PromptCard } from "@/components/prompts/PromptCard";
 import { CreatePromptDialog } from "@/components/prompts/CreatePromptDialog";
+import { EditPromptDialog } from "@/components/prompts/EditPromptDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +19,8 @@ const ITEMS_PER_PAGE = 6;
 
 export default function Prompts() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -28,6 +31,8 @@ export default function Prompts() {
       creator: "João Silva",
       lastModified: "2 dias atrás",
       status: "published" as const,
+      version: "2.1.0",
+      systemPrompt: "Você é Clara, assistente de atendimento ao cliente...",
     },
     {
       id: 2,
@@ -35,6 +40,8 @@ export default function Prompts() {
       creator: "Maria Santos",
       lastModified: "5 dias atrás",
       status: "published" as const,
+      version: "1.5.0",
+      systemPrompt: "Você é um assistente de vendas...",
     },
     {
       id: 3,
@@ -42,6 +49,8 @@ export default function Prompts() {
       creator: "Pedro Costa",
       lastModified: "1 semana atrás",
       status: "draft" as const,
+      version: "1.0.0",
+      systemPrompt: "Você é um analista especializado...",
     },
     {
       id: 4,
@@ -49,6 +58,8 @@ export default function Prompts() {
       creator: "Ana Lima",
       lastModified: "3 dias atrás",
       status: "published" as const,
+      version: "1.2.1",
+      systemPrompt: "Você é um especialista em marketing...",
     },
     {
       id: 5,
@@ -56,6 +67,8 @@ export default function Prompts() {
       creator: "Carlos Mendes",
       lastModified: "4 dias atrás",
       status: "published" as const,
+      version: "2.0.0",
+      systemPrompt: "Você é um técnico de suporte...",
     },
     {
       id: 6,
@@ -63,6 +76,8 @@ export default function Prompts() {
       creator: "Fernanda Silva",
       lastModified: "6 dias atrás",
       status: "draft" as const,
+      version: "1.0.0",
+      systemPrompt: "Você é um guia de onboarding...",
     },
     {
       id: 7,
@@ -70,6 +85,8 @@ export default function Prompts() {
       creator: "Rafael Santos",
       lastModified: "1 dia atrás",
       status: "published" as const,
+      version: "1.1.0",
+      systemPrompt: "Você é responsável por follow-ups...",
     },
   ]);
 
@@ -93,6 +110,11 @@ export default function Prompts() {
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setCurrentPage(1);
+  };
+
+  const handleEditPrompt = (prompt: any) => {
+    setSelectedPrompt(prompt);
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -139,7 +161,7 @@ export default function Prompts() {
                 creator={prompt.creator}
                 lastModified={prompt.lastModified}
                 status={prompt.status}
-                onEdit={() => console.log("Edit", prompt.id)}
+                onEdit={() => handleEditPrompt(prompt)}
                 onHistory={() => console.log("History", prompt.id)}
                 onTest={() => console.log("Test", prompt.id)}
                 onDuplicate={() => console.log("Duplicate", prompt.id)}
@@ -205,6 +227,12 @@ export default function Prompts() {
       <CreatePromptDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
+      />
+
+      <EditPromptDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        prompt={selectedPrompt}
       />
     </div>
   );
