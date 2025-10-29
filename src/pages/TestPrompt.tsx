@@ -67,9 +67,9 @@ export default function TestPrompt() {
 
   return (
     <div className="animate-fade-in h-full flex flex-col max-w-5xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Teste de Prompt</h1>
-        <p className="text-muted-foreground">
+      <div className="mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Teste de Prompt</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Converse com a IA para testar como o prompt se comporta
         </p>
       </div>

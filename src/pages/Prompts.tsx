@@ -144,14 +144,14 @@ export default function Prompts() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Gestão de Prompts</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Gestão de Prompts</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             Crie, edite e gerencie os prompts dos seus agentes de IA
           </p>
         </div>
-        <Button className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
+        <Button className="gap-2 w-full md:w-auto" onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4" />
           Criar Prompt
         </Button>
@@ -178,7 +178,50 @@ export default function Prompts() {
         </div>
       ) : (
         <>
-          <div className="rounded-md border">
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4 mb-6">
+            {paginatedPrompts.map((prompt) => (
+              <div key={prompt.id} className="bg-card border rounded-lg p-4 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-lg">{prompt.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      por {prompt.creator} • {prompt.lastModified}
+                    </p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEditPrompt(prompt)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleViewHistory(prompt)}>
+                        <History className="h-4 w-4 mr-2" />
+                        Histórico
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex items-center justify-between">
+                  <code className="text-xs bg-muted px-2 py-1 rounded">{prompt.version}</code>
+                  <Badge 
+                    variant={prompt.status === "published" ? "default" : "secondary"}
+                    className={prompt.status === "published" ? "bg-green-600 hover:bg-green-700" : "bg-muted text-muted-foreground hover:bg-muted"}
+                  >
+                    {prompt.status === "published" ? "Publicado" : "Rascunho"}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table */}
+          <div className="hidden md:block rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
