@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wand2, GitBranch } from "lucide-react";
 
 interface EditPromptDialogProps {
@@ -36,58 +35,25 @@ export function EditPromptDialog({ open, onOpenChange, prompt }: EditPromptDialo
   const [systemPrompt, setSystemPrompt] = useState("");
   const [versionType, setVersionType] = useState<"major" | "minor" | "patch">("minor");
   const [changeDescription, setChangeDescription] = useState("");
-  
-  // Assistente fields
-  const [agentName, setAgentName] = useState("");
-  const [agentRole, setAgentRole] = useState("");
-  const [targetAudience, setTargetAudience] = useState("");
-  const [mainObjective, setMainObjective] = useState("");
-  const [toneOfVoice, setToneOfVoice] = useState("");
-  const [forbiddenPatterns, setForbiddenPatterns] = useState("");
-  const [refinementInstructions, setRefinementInstructions] = useState("");
-  const [isGenerated, setIsGenerated] = useState(false);
+  const [assistantInstructions, setAssistantInstructions] = useState("");
 
-  // Carregar dados do prompt quando o dialog abrir
   useEffect(() => {
     if (prompt && open) {
       setTitle(prompt.title);
       setSystemPrompt(prompt.systemPrompt || "");
       setChangeDescription("");
       setVersionType("minor");
+      setAssistantInstructions("");
     }
   }, [prompt, open]);
 
-  const handleGeneratePrompt = () => {
-    let generatedPrompt = `Você é ${agentName}, ${agentRole}.
-
-Público-alvo: ${targetAudience}
-
-Objetivo principal: ${mainObjective}
-
-Tom de voz: ${toneOfVoice}
-
-${forbiddenPatterns ? `Padrões proibidos:\n${forbiddenPatterns}` : ''}
-
-Siga estas diretrizes em todas as suas interações.`;
-
-    if (refinementInstructions && isGenerated) {
-      generatedPrompt += `\n\nInstruções adicionais:\n${refinementInstructions}`;
-    }
-
-    setSystemPrompt(generatedPrompt);
-    setIsGenerated(true);
-  };
-
-  const handleStartOver = () => {
-    setAgentName("");
-    setAgentRole("");
-    setTargetAudience("");
-    setMainObjective("");
-    setToneOfVoice("");
-    setForbiddenPatterns("");
-    setRefinementInstructions("");
-    setSystemPrompt("");
-    setIsGenerated(false);
+  const handleApplyAssistant = () => {
+    // Aqui você implementaria a lógica de IA para modificar o prompt
+    // Por enquanto, vamos apenas adicionar as instruções ao final do prompt
+    const updatedPrompt = `${systemPrompt}\n\n[Aplicar mudanças: ${assistantInstructions}]`;
+    setSystemPrompt(updatedPrompt);
+    setAssistantInstructions("");
+    console.log("Aplicando instruções do assistente:", assistantInstructions);
   };
 
   const handleSave = () => {
@@ -121,7 +87,7 @@ Siga estas diretrizes em todas as suas interações.`;
         <DialogHeader>
           <DialogTitle>Editar Prompt</DialogTitle>
           <DialogDescription>
-            Edite o prompt manualmente ou use o assistente. Uma nova versão será criada preservando o histórico.
+            Edite o prompt e descreva as mudanças. Uma nova versão será criada preservando o histórico.
           </DialogDescription>
         </DialogHeader>
 
@@ -143,157 +109,45 @@ Siga estas diretrizes em todas as suas interações.`;
             />
           </div>
 
-          <Tabs defaultValue="manual" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="manual">Manual</TabsTrigger>
-              <TabsTrigger value="assistant">
-                <Wand2 className="w-4 h-4 mr-2" />
-                Assistente
-              </TabsTrigger>
-            </TabsList>
+          <div className="space-y-2">
+            <Label htmlFor="systemPrompt">System Prompt</Label>
+            <Textarea
+              id="systemPrompt"
+              placeholder="Digite o system prompt..."
+              value={systemPrompt}
+              onChange={(e) => setSystemPrompt(e.target.value)}
+              className="min-h-[300px] font-mono text-sm"
+            />
+          </div>
 
-            <TabsContent value="manual" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="systemPrompt">System Prompt</Label>
-                <Textarea
-                  id="systemPrompt"
-                  placeholder="Digite o system prompt..."
-                  value={systemPrompt}
-                  onChange={(e) => setSystemPrompt(e.target.value)}
-                  className="min-h-[400px] font-mono text-sm"
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="assistant" className="space-y-4 mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="agentName">Nome do Agente</Label>
-                  <Input
-                    id="agentName"
-                    placeholder="Ex: Clara"
-                    value={agentName}
-                    onChange={(e) => setAgentName(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="agentRole">Função / Papel do Agente</Label>
-                  <Input
-                    id="agentRole"
-                    placeholder="Ex: assistente de atendimento ao cliente"
-                    value={agentRole}
-                    onChange={(e) => setAgentRole(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="targetAudience">Público-alvo</Label>
-                <Input
-                  id="targetAudience"
-                  placeholder="Ex: Clientes da loja online de eletrônicos"
-                  value={targetAudience}
-                  onChange={(e) => setTargetAudience(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="mainObjective">Objetivo Principal</Label>
-                <Textarea
-                  id="mainObjective"
-                  placeholder="Ex: Ajudar clientes com dúvidas sobre produtos e pedidos"
-                  value={mainObjective}
-                  onChange={(e) => setMainObjective(e.target.value)}
-                  className="min-h-[80px]"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="toneOfVoice">Tom de Voz</Label>
-                <Select value={toneOfVoice} onValueChange={setToneOfVoice}>
-                  <SelectTrigger id="toneOfVoice">
-                    <SelectValue placeholder="Selecione o tom de voz" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="amigavel">Amigável</SelectItem>
-                    <SelectItem value="formal">Formal</SelectItem>
-                    <SelectItem value="tecnico">Técnico</SelectItem>
-                    <SelectItem value="educado">Educado</SelectItem>
-                    <SelectItem value="institucional">Institucional</SelectItem>
-                    <SelectItem value="neutro">Neutro</SelectItem>
-                    <SelectItem value="engracado">Engraçado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="forbiddenPatterns">Padrões Proibidos</Label>
-                <Textarea
-                  id="forbiddenPatterns"
-                  placeholder="Ex: Não usar gírias, não dar opiniões pessoais, evitar emojis"
-                  value={forbiddenPatterns}
-                  onChange={(e) => setForbiddenPatterns(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleGeneratePrompt}
-                  className="flex-1"
-                  variant="secondary"
-                  disabled={!agentName || !agentRole}
-                >
-                  <Wand2 className="w-4 h-4 mr-2" />
-                  {isGenerated ? "Regenerar Prompt" : "Gerar System Prompt"}
-                </Button>
-                {isGenerated && (
-                  <Button
-                    onClick={handleStartOver}
-                    variant="outline"
-                  >
-                    Começar do Zero
-                  </Button>
-                )}
-              </div>
-
-              {systemPrompt && (
-                <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-                  <div className="space-y-2">
-                    <Label>Prompt Gerado</Label>
-                    <Textarea
-                      value={systemPrompt}
-                      onChange={(e) => setSystemPrompt(e.target.value)}
-                      className="min-h-[400px] font-mono text-sm"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="refinement">
-                      Instruções Adicionais (opcional)
-                    </Label>
-                    <Textarea
-                      id="refinement"
-                      placeholder="Ex: Adicione mais empatia nas respostas, seja mais direto, inclua exemplos práticos..."
-                      value={refinementInstructions}
-                      onChange={(e) => setRefinementInstructions(e.target.value)}
-                      className="min-h-[100px]"
-                    />
-                    <Button
-                      onClick={handleGeneratePrompt}
-                      size="sm"
-                      variant="secondary"
-                      disabled={!refinementInstructions}
-                    >
-                      <Wand2 className="w-4 h-4 mr-2" />
-                      Aplicar Refinamento
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+          <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+            <div className="flex items-center gap-2">
+              <Wand2 className="h-4 w-4 text-primary" />
+              <Label htmlFor="assistantInstructions" className="text-base font-medium">
+                Assistente de Prompt
+              </Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Descreva o que deseja incluir ou modificar no prompt acima
+            </p>
+            <Textarea
+              id="assistantInstructions"
+              placeholder="Ex: Adicione mais empatia nas respostas, seja mais técnico ao explicar produtos, inclua exemplos práticos..."
+              value={assistantInstructions}
+              onChange={(e) => setAssistantInstructions(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <Button
+              onClick={handleApplyAssistant}
+              size="sm"
+              variant="secondary"
+              disabled={!assistantInstructions}
+              className="w-full"
+            >
+              <Wand2 className="w-4 h-4 mr-2" />
+              Aplicar Mudanças com Assistente
+            </Button>
+          </div>
 
           <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
             <div className="space-y-2">
