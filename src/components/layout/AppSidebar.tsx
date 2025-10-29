@@ -1,10 +1,14 @@
 import { NavLink } from "react-router-dom";
+import { useTheme } from "next-themes";
 import {
   Bot,
   FileText,
   TestTube,
   History,
   Link,
+  Sun,
+  Moon,
+  ArrowLeft,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,8 +31,14 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
   return (
-    <Sidebar className="border-r border-border">
+    <Sidebar className="border-r border-border flex flex-col">
       <SidebarHeader className="border-b border-border px-6 py-4">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
@@ -41,7 +51,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="flex-1">
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-medium text-muted-foreground px-3">
             Navegação
@@ -72,6 +82,30 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <div className="border-t border-border p-4 space-y-2">
+        <button
+          onClick={toggleTheme}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-foreground hover:bg-muted transition-colors"
+        >
+          {theme === "dark" ? (
+            <>
+              <Sun className="h-4 w-4" />
+              <span>Tema Claro</span>
+            </>
+          ) : (
+            <>
+              <Moon className="h-4 w-4" />
+              <span>Tema Escuro</span>
+            </>
+          )}
+        </button>
+
+        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-foreground hover:bg-muted transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          <span>Voltar</span>
+        </button>
+      </div>
     </Sidebar>
   );
 }

@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
@@ -15,23 +16,25 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Agents />} />
-            <Route path="/prompts" element={<Prompts />} />
-            <Route path="/test" element={<TestPrompt />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/link" element={<LinkPrompt />} />
-          </Route>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="light">
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Agents />} />
+              <Route path="/prompts" element={<Prompts />} />
+              <Route path="/test" element={<TestPrompt />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/link" element={<LinkPrompt />} />
+            </Route>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
