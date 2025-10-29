@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { GitBranch, Clock, User, FileText, Undo2 } from "lucide-react";
+import { GitBranch, Clock, User, FileText } from "lucide-react";
 
 interface PromptVersion {
   version: string;
@@ -93,11 +93,6 @@ export function PromptHistoryDialog({ open, onOpenChange, prompt }: PromptHistor
     }
   };
 
-  const handleRestore = (version: string) => {
-    console.log("Restaurar versão:", version, "do prompt:", prompt?.id);
-    // Implementar lógica de restauração
-  };
-
   if (!prompt) return null;
 
   return (
@@ -130,33 +125,21 @@ export function PromptHistoryDialog({ open, onOpenChange, prompt }: PromptHistor
                   </div>
 
                   <div className="flex-1 space-y-3 pb-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <code className="text-sm font-mono font-semibold">
-                          v{version.version}
-                        </code>
-                        <Badge variant={getVersionTypeColor(version.type)}>
-                          {getVersionTypeLabel(version.type)}
+                    <div className="flex items-center gap-2">
+                      <code className="text-sm font-mono font-semibold">
+                        v{version.version}
+                      </code>
+                      <Badge variant={getVersionTypeColor(version.type)}>
+                        {getVersionTypeLabel(version.type)}
+                      </Badge>
+                      {version.version === prompt.currentVersion && (
+                        <Badge variant="outline" className="bg-primary/10">
+                          Atual
                         </Badge>
-                        {version.version === prompt.currentVersion && (
-                          <Badge variant="outline" className="bg-primary/10">
-                            Atual
-                          </Badge>
-                        )}
-                      </div>
-                      {version.version !== prompt.currentVersion && (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleRestore(version.version)}
-                        >
-                          <Undo2 className="h-3 w-3 mr-2" />
-                          Restaurar
-                        </Button>
                       )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
@@ -173,17 +156,18 @@ export function PromptHistoryDialog({ open, onOpenChange, prompt }: PromptHistor
                         <p className="text-sm">{version.changeDescription}</p>
                       </div>
 
-                      <details className="group">
-                        <summary className="cursor-pointer text-sm text-primary hover:underline list-none flex items-center gap-1">
-                          <span className="group-open:rotate-90 transition-transform">▶</span>
-                          Ver conteúdo do prompt
-                        </summary>
-                        <div className="mt-2 p-3 bg-muted rounded-lg">
-                          <pre className="text-xs font-mono whitespace-pre-wrap">
-                            {version.systemPrompt}
-                          </pre>
-                        </div>
-                      </details>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground uppercase">
+                          Conteúdo do Prompt
+                        </p>
+                        <ScrollArea className="h-[200px] w-full rounded-md border bg-muted/30">
+                          <div className="p-4">
+                            <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                              {version.systemPrompt}
+                            </p>
+                          </div>
+                        </ScrollArea>
+                      </div>
                     </div>
                   </div>
                 </div>
