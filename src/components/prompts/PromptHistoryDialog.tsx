@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { GitBranch, Clock, User, FileText } from "lucide-react";
+import { GitBranch, Clock, User, FileText, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PromptVersion {
   version: string;
@@ -31,6 +33,27 @@ interface PromptHistoryDialogProps {
 }
 
 export function PromptHistoryDialog({ open, onOpenChange, prompt }: PromptHistoryDialogProps) {
+  const { toast } = useToast();
+  const [copiedVersion, setCopiedVersion] = useState<string | null>(null);
+
+  const handleCopyPrompt = async (content: string, version: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedVersion(version);
+      toast({
+        title: "Conteúdo copiado!",
+        description: `Prompt da versão ${version} copiado para a área de transferência.`,
+      });
+      setTimeout(() => setCopiedVersion(null), 2000);
+    } catch (err) {
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar o conteúdo.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Mock data - substituir por dados reais do backend
   const versions: PromptVersion[] = [
     {
@@ -129,9 +152,6 @@ export function PromptHistoryDialog({ open, onOpenChange, prompt }: PromptHistor
                       <code className="text-sm font-mono font-semibold">
                         v{version.version}
                       </code>
-                      <Badge variant={getVersionTypeColor(version.type)}>
-                        {getVersionTypeLabel(version.type)}
-                      </Badge>
                       {version.version === prompt.currentVersion && (
                         <Badge variant="outline" className="bg-primary/10">
                           Atual
@@ -157,9 +177,29 @@ export function PromptHistoryDialog({ open, onOpenChange, prompt }: PromptHistor
                       </div>
 
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase">
-                          Conteúdo do Prompt
-                        </p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground uppercase">
+                            Conteúdo do Prompt
+                          </p>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCopyPrompt(version.systemPrompt, version.version)}
+                            className="h-7"
+                          >
+                            {copiedVersion === version.version ? (
+                              <>
+                                <Check className="h-3 w-3 mr-1" />
+                                Copiado
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3 w-3 mr-1" />
+                                Copiar
+                              </>
+                            )}
+                          </Button>
+                        </div>
                         <ScrollArea className="h-[200px] w-full rounded-md border bg-muted/30">
                           <div className="p-4">
                             <p className="text-sm whitespace-pre-wrap leading-relaxed">
