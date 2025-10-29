@@ -93,7 +93,7 @@ export function AppSidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold gradient-text">HGTX Codex</h1>
+          <h1 className="text-2xl font-bold gradient-text">HGTX PromptLab</h1>
           <p className="text-xs text-muted-foreground mt-1">AI Interface System</p>
         </div>
         <Button
