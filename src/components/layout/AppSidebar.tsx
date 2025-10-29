@@ -1,26 +1,18 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useTheme } from "next-themes";
 import {
   Bot,
   FileText,
   TestTube,
   History,
   Link,
-  Sun,
-  Moon,
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "./ThemeToggle";
 
 const menuItems = [
   { title: "Agentes", url: "/", icon: Bot },
@@ -31,81 +23,129 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { theme, setTheme } = useTheme();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
-
-  return (
-    <Sidebar className="border-r border-border flex flex-col">
-      <SidebarHeader className="border-b border-border px-6 py-4">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Bot className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-foreground">HGTX</h1>
-            <p className="text-xs text-muted-foreground">PromptLab</p>
+  if (isCollapsed) {
+    return (
+      <aside className="hidden md:flex md:w-16 bg-sidebar border-r border-sidebar-border flex-col">
+        {/* Collapsed Header with Expand Button */}
+        <div className="p-3 border-b border-sidebar-border space-y-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsCollapsed(false)}
+            className="w-full text-muted-foreground hover:text-foreground"
+            title="Expandir"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+          <div className="w-full flex justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+              <span className="text-xs font-bold text-white">HX</span>
+            </div>
           </div>
         </div>
-      </SidebarHeader>
 
-      <SidebarContent className="flex-1">
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground px-3">
-            Navegação
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end
-                      className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                          isActive
-                            ? "bg-primary text-primary-foreground font-medium"
-                            : "text-foreground hover:bg-muted"
-                        }`
-                      }
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+        {/* Navigation Icons */}
+        <nav className="flex-1 px-2 py-2 space-y-1">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.title}
+                to={item.url}
+                end
+                className={({ isActive }) =>
+                  `w-full p-3 rounded-lg transition-all flex items-center justify-center ${
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground cyber-border"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`
+                }
+                title={item.title}
+              >
+                <Icon className="w-5 h-5" />
+              </NavLink>
+            );
+          })}
+        </nav>
 
-      <div className="border-t border-border p-4 space-y-2">
-        <button
-          onClick={toggleTheme}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-foreground hover:bg-muted transition-colors"
+        <Separator className="bg-sidebar-border" />
+
+        {/* Theme & Settings Icons */}
+        <div className="p-3 border-t border-sidebar-border space-y-2">
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-full text-sidebar-foreground"
+            title="Voltar"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+        </div>
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="hidden md:flex md:w-72 bg-sidebar border-r border-sidebar-border flex-col">
+      {/* Logo */}
+      <div className="p-6 border-b border-sidebar-border flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold gradient-text">HGTX Codex</h1>
+          <p className="text-xs text-muted-foreground mt-1">AI Interface System</p>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsCollapsed(true)}
+          className="h-8 w-8 text-muted-foreground hover:text-foreground"
         >
-          {theme === "dark" ? (
-            <>
-              <Sun className="h-4 w-4" />
-              <span>Tema Claro</span>
-            </>
-          ) : (
-            <>
-              <Moon className="h-4 w-4" />
-              <span>Tema Escuro</span>
-            </>
-          )}
-        </button>
-
-        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-foreground hover:bg-muted transition-colors">
-          <ArrowLeft className="h-4 w-4" />
-          <span>Voltar</span>
-        </button>
+          <ChevronLeft className="w-4 h-4" />
+        </Button>
       </div>
-    </Sidebar>
+
+      {/* Navigation Tabs */}
+      <nav className="flex-1 px-3 py-2 space-y-1">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.title}
+              to={item.url}
+              end
+              className={({ isActive }) =>
+                `w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground cyber-border"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                }`
+              }
+            >
+              <Icon className="w-5 h-5" />
+              <span className="font-medium">{item.title}</span>
+            </NavLink>
+          );
+        })}
+      </nav>
+
+      <Separator className="bg-sidebar-border" />
+
+      {/* Settings & Theme */}
+      <div className="p-4 border-t border-sidebar-border space-y-2">
+        <div className="flex items-center justify-between px-3">
+          <span className="text-sm font-medium text-sidebar-foreground">Tema</span>
+          <ThemeToggle />
+        </div>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-sidebar-foreground"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Voltar
+        </Button>
+      </div>
+    </aside>
   );
 }
