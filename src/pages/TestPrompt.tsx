@@ -24,6 +24,7 @@ export default function TestPrompt() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function TestPrompt() {
   }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim() || !selectedPrompt) return;
+    if (!input.trim() || !selectedPrompt || !selectedModel) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -74,21 +75,43 @@ export default function TestPrompt() {
       </div>
 
       <Card className="flex-1 flex flex-col overflow-hidden">
-        {/* Selector de Prompt */}
-        <div className="p-4 border-b border-border">
-          <Label htmlFor="prompt-select" className="mb-2 block">
-            Selecione o Prompt
-          </Label>
-          <Select value={selectedPrompt} onValueChange={setSelectedPrompt}>
-            <SelectTrigger id="prompt-select">
-              <SelectValue placeholder="Escolha um prompt" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="atendimento">Prompt de Atendimento v2.1</SelectItem>
-              <SelectItem value="vendas">Prompt de Vendas v1.5</SelectItem>
-              <SelectItem value="analise">Prompt de Análise</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Selector de Prompt e Modelo */}
+        <div className="p-4 border-b border-border space-y-4">
+          <div>
+            <Label htmlFor="prompt-select" className="mb-2 block">
+              Selecione o Prompt
+            </Label>
+            <Select value={selectedPrompt} onValueChange={setSelectedPrompt}>
+              <SelectTrigger id="prompt-select">
+                <SelectValue placeholder="Escolha um prompt" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="atendimento">Prompt de Atendimento v2.1</SelectItem>
+                <SelectItem value="vendas">Prompt de Vendas v1.5</SelectItem>
+                <SelectItem value="analise">Prompt de Análise</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="model-select" className="mb-2 block">
+              Modelo de IA
+            </Label>
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger id="model-select">
+                <SelectValue placeholder="Escolha um modelo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gemini-2.5-flash">Google Gemini 2.5 Flash</SelectItem>
+                <SelectItem value="gemini-2.5-pro">Google Gemini 2.5 Pro</SelectItem>
+                <SelectItem value="gpt-5">OpenAI GPT-5</SelectItem>
+                <SelectItem value="gpt-5-mini">OpenAI GPT-5 Mini</SelectItem>
+                <SelectItem value="gpt-4.1">OpenAI GPT-4.1</SelectItem>
+                <SelectItem value="claude-sonnet-4-5">Anthropic Claude Sonnet 4.5</SelectItem>
+                <SelectItem value="claude-opus-4-1">Anthropic Claude Opus 4.1</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Chat Area */}
@@ -96,7 +119,7 @@ export default function TestPrompt() {
           <div className="space-y-4">
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p>Selecione um prompt e comece a conversar</p>
+                <p>Selecione um prompt e modelo para começar a conversar</p>
               </div>
             ) : (
               messages.map((message) => (
@@ -153,12 +176,12 @@ export default function TestPrompt() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={isLoading || !selectedPrompt}
+              disabled={isLoading || !selectedPrompt || !selectedModel}
               className="flex-1"
             />
             <Button
               onClick={handleSend}
-              disabled={!input.trim() || isLoading || !selectedPrompt}
+              disabled={!input.trim() || isLoading || !selectedPrompt || !selectedModel}
               size="icon"
             >
               <Send className="h-4 w-4" />
