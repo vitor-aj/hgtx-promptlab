@@ -3,21 +3,14 @@ import { CreateAgentDialog } from "@/components/agents/CreateAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Search, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, MoreVertical, Edit, Trash2, Bot, Zap } from "lucide-react";
 
 export default function Agents() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -89,19 +82,29 @@ export default function Agents() {
           <p className="text-muted-foreground">Nenhum agente encontrado.</p>
         </div>
       ) : (
-        <>
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {filteredAgents.map((agent) => (
-              <div key={agent.id} className="bg-card border rounded-lg p-4 space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAgents.map((agent) => (
+            <Card 
+              key={agent.id} 
+              className="group relative overflow-hidden border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-gradient-to-br from-card to-card/50"
+            >
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              <CardHeader className="relative pb-3">
                 <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-medium text-lg">{agent.name}</h3>
-                    <p className="text-sm text-muted-foreground">{agent.createdAt}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Bot className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">{agent.name}</CardTitle>
+                      <CardDescription className="text-xs mt-1">{agent.createdAt}</CardDescription>
+                    </div>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -120,88 +123,43 @@ export default function Agents() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-xs text-muted-foreground">Prompt:</span>
-                    <p className="text-sm">{agent.prompt}</p>
+              </CardHeader>
+
+              <CardContent className="relative space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50">
+                    <Zap className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground mb-1">Prompt</p>
+                      <p className="text-sm font-medium truncate">{agent.prompt}</p>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground">Modelo:</span>
-                    <p className="text-sm">
-                      <code className="text-xs bg-muted px-2 py-1 rounded">{agent.model}</code>
-                    </p>
+
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <p className="text-xs text-muted-foreground mb-2">Modelo de IA</p>
+                    <code className="text-xs bg-background/80 px-3 py-1.5 rounded-md border inline-block">
+                      {agent.model}
+                    </code>
                   </div>
                 </div>
-                <Badge 
-                  variant={agent.status === "active" ? "default" : "secondary"}
-                  className={agent.status === "active" ? "bg-green-600 hover:bg-green-700" : "bg-muted text-muted-foreground hover:bg-muted"}
-                >
-                  {agent.status === "active" ? "Ativo" : "Inativo"}
-                </Badge>
-              </div>
-            ))}
-          </div>
 
-          {/* Desktop Table */}
-          <div className="hidden md:block rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Prompt</TableHead>
-                  <TableHead>Modelo</TableHead>
-                  <TableHead>Criado</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAgents.map((agent) => (
-                  <TableRow key={agent.id}>
-                    <TableCell className="font-medium">{agent.name}</TableCell>
-                    <TableCell>{agent.prompt}</TableCell>
-                    <TableCell>
-                      <code className="text-xs bg-muted px-2 py-1 rounded">
-                        {agent.model}
-                      </code>
-                    </TableCell>
-                    <TableCell>{agent.createdAt}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={agent.status === "active" ? "default" : "secondary"}
-                        className={agent.status === "active" ? "bg-green-600 hover:bg-green-700" : "bg-muted text-muted-foreground hover:bg-muted"}
-                      >
-                        {agent.status === "active" ? "Ativo" : "Inativo"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => console.log("Edit", agent.id)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => console.log("Delete", agent.id)}
-                            className="text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </>
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <span className="text-xs text-muted-foreground">Status</span>
+                  <Badge 
+                    variant={agent.status === "active" ? "default" : "secondary"}
+                    className={
+                      agent.status === "active" 
+                        ? "bg-green-600 hover:bg-green-700 shadow-sm" 
+                        : "bg-muted text-muted-foreground hover:bg-muted"
+                    }
+                  >
+                    {agent.status === "active" ? "● Ativo" : "○ Inativo"}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
 
       <CreateAgentDialog

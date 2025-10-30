@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 
 const menuItems = [
-  { title: "Agentes", url: "/agents", icon: Bot },
-  { title: "Prompts", url: "/", icon: FileText },
+  { title: "Agentes", url: "/", icon: Bot },
+  { title: "Prompts", url: "/prompts", icon: FileText },
   { title: "Testar Prompt", url: "/test", icon: TestTube },
 ];
 

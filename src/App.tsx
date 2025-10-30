@@ -22,8 +22,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route element={<AppLayout />}>
-              <Route path="/agents" element={<Agents />} />
-              <Route path="/" element={<Prompts />} />
+              <Route path="/" element={<Agents />} />
+              <Route path="/prompts" element={<Prompts />} />
               <Route path="/test" element={<TestPrompt />} />
               <Route path="/history" element={<History />} />
             </Route>
