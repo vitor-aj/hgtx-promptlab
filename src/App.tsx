@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import Agents from "./pages/Agents";
-import Prompts from "./pages/Prompts";
+import AgentDetails from "./pages/AgentDetails";
 import TestPrompt from "./pages/TestPrompt";
 import History from "./pages/History";
 import NotFound from "./pages/NotFound";
@@ -23,7 +23,7 @@ const App = () => (
           <Routes>
             <Route element={<AppLayout />}>
               <Route path="/" element={<Agents />} />
-              <Route path="/prompts" element={<Prompts />} />
+              <Route path="/agents/:id" element={<AgentDetails />} />
               <Route path="/test" element={<TestPrompt />} />
               <Route path="/history" element={<History />} />
             </Route>

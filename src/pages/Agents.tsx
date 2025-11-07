@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CreateAgentDialog } from "@/components/agents/CreateAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import {
 import { Plus, Search, MoreVertical, Edit, Trash2, Bot, Zap } from "lucide-react";
 
 export default function Agents() {
+  const navigate = useNavigate();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -86,7 +88,8 @@ export default function Agents() {
           {filteredAgents.map((agent) => (
             <Card 
               key={agent.id} 
-              className="group relative overflow-hidden border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-gradient-to-br from-card to-card/50"
+              className="group relative overflow-hidden border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-gradient-to-br from-card to-card/50 cursor-pointer"
+              onClick={() => navigate(`/agents/${agent.id}`)}
             >
               {/* Glow effect on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -104,17 +107,30 @@ export default function Agents() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => console.log("Edit", agent.id)}>
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/agents/${agent.id}`);
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-2" />
                         Editar
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={() => console.log("Delete", agent.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log("Delete", agent.id);
+                        }}
                         className="text-destructive"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
