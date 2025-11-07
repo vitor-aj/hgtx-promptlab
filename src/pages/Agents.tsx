@@ -4,14 +4,8 @@ import { CreateAgentDialog } from "@/components/agents/CreateAgentDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Plus, Search, MoreVertical, Edit, Trash2, Bot, Zap } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Search, Bot, ChevronRight } from "lucide-react";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -23,7 +17,7 @@ export default function Agents() {
       id: 1,
       name: "Agente de Atendimento",
       status: "active" as const,
-      prompt: "Prompt de Atendimento v2.1",
+      version: "2.1",
       model: "Google Gemini 2.5 Flash",
       createdAt: "2 dias atrás",
     },
@@ -31,7 +25,7 @@ export default function Agents() {
       id: 2,
       name: "Agente de Vendas",
       status: "active" as const,
-      prompt: "Prompt de Vendas v1.5",
+      version: "1.5",
       model: "OpenAI GPT-5",
       createdAt: "5 dias atrás",
     },
@@ -39,7 +33,7 @@ export default function Agents() {
       id: 3,
       name: "Agente de Análise",
       status: "inactive" as const,
-      prompt: "Prompt de Análise",
+      version: "1.0",
       model: "Anthropic Claude Sonnet 4.5",
       createdAt: "1 semana atrás",
     },
@@ -95,68 +89,30 @@ export default function Agents() {
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
               <CardHeader className="relative pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Bot className="h-6 w-6 text-primary" />
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
+                      <Bot className="h-7 w-7 text-primary" />
                     </div>
-                    <div>
-                      <CardTitle className="text-xl">{agent.name}</CardTitle>
-                      <CardDescription className="text-xs mt-1">{agent.createdAt}</CardDescription>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-xl truncate">{agent.name}</CardTitle>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          v{agent.version}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/agents/${agent.id}`);
-                        }}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log("Delete", agent.id);
-                        }}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all">
+                    <ChevronRight className="h-5 w-5 text-primary" />
+                  </div>
                 </div>
               </CardHeader>
 
-              <CardContent className="relative space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50">
-                    <Zap className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground mb-1">Prompt</p>
-                      <p className="text-sm font-medium truncate">{agent.prompt}</p>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-lg bg-muted/50">
-                    <p className="text-xs text-muted-foreground mb-2">Modelo de IA</p>
-                    <code className="text-xs bg-background/80 px-3 py-1.5 rounded-md border inline-block">
-                      {agent.model}
-                    </code>
-                  </div>
+              <CardContent className="relative space-y-3">
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground mb-2">Modelo de IA</p>
+                  <p className="text-sm font-medium">{agent.model}</p>
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t">
