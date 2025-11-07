@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User } from "lucide-react";
+import { Send, Bot, User, RotateCcw } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,7 @@ export default function TestPrompt() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   // Mock data de agentes
   const agents = [
@@ -76,6 +78,14 @@ export default function TestPrompt() {
     }
   };
 
+  const handleClearChat = () => {
+    setMessages([]);
+    toast({
+      title: "Conversa limpa",
+      description: "O histórico de mensagens foi limpo com sucesso.",
+    });
+  };
+
   return (
     <div className="animate-fade-in h-full flex flex-col max-w-5xl mx-auto">
       <div className="mb-4 md:mb-6">
@@ -88,21 +98,35 @@ export default function TestPrompt() {
       <Card className="flex-1 flex flex-col overflow-hidden">
         {/* Selector de Agente */}
         <div className="p-4 border-b border-border">
-          <Label htmlFor="agent-select" className="mb-2 block">
-            Selecione o Agente
-          </Label>
-          <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-            <SelectTrigger id="agent-select">
-              <SelectValue placeholder="Escolha um agente" />
-            </SelectTrigger>
-            <SelectContent>
-              {agents.map((agent) => (
-                <SelectItem key={agent.id} value={agent.id}>
-                  {agent.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-end justify-between gap-4">
+            <div className="flex-1">
+              <Label htmlFor="agent-select" className="mb-2 block">
+                Selecione o Agente
+              </Label>
+              <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                <SelectTrigger id="agent-select">
+                  <SelectValue placeholder="Escolha um agente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {agents.map((agent) => (
+                    <SelectItem key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              variant="outline"
+              size="default"
+              onClick={handleClearChat}
+              disabled={messages.length === 0}
+              className="gap-2"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span className="hidden sm:inline">Nova Conversa</span>
+            </Button>
+          </div>
         </div>
 
         {/* Chat Area */}
