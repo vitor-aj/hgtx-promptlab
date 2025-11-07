@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Copy, ChevronDown, ChevronUp } from "lucide-react";
+import { Copy, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -35,17 +35,7 @@ export function VersionHistoryDialog({
   versions,
 }: VersionHistoryDialogProps) {
   const { toast } = useToast();
-  const [expandedVersions, setExpandedVersions] = useState<Set<number>>(new Set());
-
-  const toggleExpanded = (versionId: number) => {
-    const newExpanded = new Set(expandedVersions);
-    if (newExpanded.has(versionId)) {
-      newExpanded.delete(versionId);
-    } else {
-      newExpanded.add(versionId);
-    }
-    setExpandedVersions(newExpanded);
-  };
+  const [viewingPrompt, setViewingPrompt] = useState<{ prompt: string; version: string } | null>(null);
 
   const handleCopyPrompt = async (prompt: string) => {
     try {
@@ -77,22 +67,21 @@ export function VersionHistoryDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] w-[95vw] sm:w-full">
-        <DialogHeader>
-          <DialogTitle>Histórico de Versões</DialogTitle>
-          <DialogDescription>
-            Todas as alterações salvas do prompt de {agentName}
-          </DialogDescription>
-        </DialogHeader>
-        <ScrollArea className="h-[60vh] pr-4">
-          <div className="space-y-4">
-            {versions.map((version) => {
-              const isExpanded = expandedVersions.has(version.id);
-              return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl max-h-[85vh] w-[95vw] sm:w-full">
+          <DialogHeader>
+            <DialogTitle>Histórico de Versões</DialogTitle>
+            <DialogDescription>
+              Todas as alterações salvas do prompt de {agentName}
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-4">
+              {versions.map((version) => (
                 <div
                   key={version.id}
-                  className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="p-4 rounded-lg border bg-card transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -113,50 +102,58 @@ export function VersionHistoryDialog({
                         </div>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0"
-                      onClick={() => handleCopyPrompt(version.prompt)}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
                   </div>
 
-                  <div className="mt-3">
+                  <div className="mt-3 flex items-center justify-between pt-3 border-t">
+                    <div className="text-xs text-muted-foreground">
+                      <p>
+                        {version.author} • {version.createdAt}
+                      </p>
+                    </div>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="w-full justify-between h-auto py-2 px-3 font-normal"
-                      onClick={() => toggleExpanded(version.id)}
+                      className="gap-2"
+                      onClick={() => setViewingPrompt({ prompt: version.prompt, version: version.version })}
                     >
-                      <span className="text-sm font-medium">System Prompt da versão</span>
-                      {isExpanded ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
+                      <Eye className="h-4 w-4" />
+                      Ver System Prompt
                     </Button>
-                    {isExpanded && (
-                      <div className="mt-2 p-3 rounded bg-muted/50 border">
-                        <p className="text-xs font-mono text-muted-foreground whitespace-pre-wrap">
-                          {version.prompt}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-3 pt-3 border-t text-xs text-muted-foreground">
-                    <p>
-                      {version.author} • {version.createdAt}
-                    </p>
                   </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para visualizar o prompt completo */}
+      <Dialog open={!!viewingPrompt} onOpenChange={() => setViewingPrompt(null)}>
+        <DialogContent className="max-w-4xl max-h-[85vh] w-[95vw] sm:w-full">
+          <DialogHeader>
+            <DialogTitle>System Prompt - v{viewingPrompt?.version}</DialogTitle>
+            <DialogDescription>
+              Visualização completa do prompt
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="p-4 rounded-lg bg-muted/50 border">
+              <p className="text-sm font-mono text-foreground whitespace-pre-wrap">
+                {viewingPrompt?.prompt}
+              </p>
+            </div>
+          </ScrollArea>
+          <div className="flex justify-end">
+            <Button
+              onClick={() => viewingPrompt && handleCopyPrompt(viewingPrompt.prompt)}
+              className="gap-2"
+            >
+              <Copy className="h-4 w-4" />
+              Copiar Prompt
+            </Button>
           </div>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
