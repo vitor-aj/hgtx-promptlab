@@ -23,9 +23,15 @@ export default function TestPrompt() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPrompt, setSelectedPrompt] = useState("");
-  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedAgent, setSelectedAgent] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Mock data de agentes
+  const agents = [
+    { id: "1", name: "Agente de Atendimento" },
+    { id: "2", name: "Agente de Vendas" },
+    { id: "3", name: "Agente de Análise" },
+  ];
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -34,7 +40,7 @@ export default function TestPrompt() {
   }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim() || !selectedPrompt || !selectedModel) return;
+    if (!input.trim() || !selectedAgent) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -51,7 +57,7 @@ export default function TestPrompt() {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content:
-          "Esta é uma resposta simulada do agente de IA. Em produção, esta resposta seria gerada pelo modelo de IA configurado com o prompt selecionado. A conversa continua naturalmente.",
+          "Esta é uma resposta simulada do agente de IA. Em produção, esta resposta seria gerada pelo modelo de IA configurado no agente selecionado.",
       };
       setMessages((prev) => [...prev, aiMessage]);
       setIsLoading(false);
@@ -68,50 +74,30 @@ export default function TestPrompt() {
   return (
     <div className="animate-fade-in h-full flex flex-col max-w-5xl mx-auto">
       <div className="mb-4 md:mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Teste de Prompt</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Testar Agente</h1>
         <p className="text-sm md:text-base text-muted-foreground">
-          Converse com a IA para testar como o prompt se comporta
+          Converse com o agente para testar seu comportamento
         </p>
       </div>
 
       <Card className="flex-1 flex flex-col overflow-hidden">
-        {/* Selector de Prompt e Modelo */}
-        <div className="p-4 border-b border-border space-y-4">
-          <div>
-            <Label htmlFor="prompt-select" className="mb-2 block">
-              Selecione o Prompt
-            </Label>
-            <Select value={selectedPrompt} onValueChange={setSelectedPrompt}>
-              <SelectTrigger id="prompt-select">
-                <SelectValue placeholder="Escolha um prompt" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="atendimento">Prompt de Atendimento v2.1</SelectItem>
-                <SelectItem value="vendas">Prompt de Vendas v1.5</SelectItem>
-                <SelectItem value="analise">Prompt de Análise</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="model-select" className="mb-2 block">
-              Modelo de IA
-            </Label>
-            <Select value={selectedModel} onValueChange={setSelectedModel}>
-              <SelectTrigger id="model-select">
-                <SelectValue placeholder="Escolha um modelo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gemini-2.5-flash">Google Gemini 2.5 Flash</SelectItem>
-                <SelectItem value="gemini-2.5-pro">Google Gemini 2.5 Pro</SelectItem>
-                <SelectItem value="gpt-5">OpenAI GPT-5</SelectItem>
-                <SelectItem value="gpt-5-mini">OpenAI GPT-5 Mini</SelectItem>
-                <SelectItem value="gpt-4.1">OpenAI GPT-4.1</SelectItem>
-                <SelectItem value="claude-sonnet-4-5">Anthropic Claude Sonnet 4.5</SelectItem>
-                <SelectItem value="claude-opus-4-1">Anthropic Claude Opus 4.1</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Selector de Agente */}
+        <div className="p-4 border-b border-border">
+          <Label htmlFor="agent-select" className="mb-2 block">
+            Selecione o Agente
+          </Label>
+          <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+            <SelectTrigger id="agent-select">
+              <SelectValue placeholder="Escolha um agente" />
+            </SelectTrigger>
+            <SelectContent>
+              {agents.map((agent) => (
+                <SelectItem key={agent.id} value={agent.id}>
+                  {agent.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Chat Area */}
@@ -119,7 +105,7 @@ export default function TestPrompt() {
           <div className="space-y-4">
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p>Selecione um prompt e modelo para começar a conversar</p>
+                <p>Selecione um agente para começar a conversar</p>
               </div>
             ) : (
               messages.map((message) => (
@@ -176,12 +162,12 @@ export default function TestPrompt() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={isLoading || !selectedPrompt || !selectedModel}
+              disabled={isLoading || !selectedAgent}
               className="flex-1"
             />
             <Button
               onClick={handleSend}
-              disabled={!input.trim() || isLoading || !selectedPrompt || !selectedModel}
+              disabled={!input.trim() || isLoading || !selectedAgent}
               size="icon"
             >
               <Send className="h-4 w-4" />
