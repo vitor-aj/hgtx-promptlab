@@ -9,6 +9,16 @@ import { ArrowLeft, Save, History, Power } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VersionHistoryDialog } from "@/components/agents/VersionHistoryDialog";
 import { SaveVersionDialog } from "@/components/agents/SaveVersionDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function AgentDetails() {
   const { id } = useParams();
@@ -16,6 +26,7 @@ export default function AgentDetails() {
   const { toast } = useToast();
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isSaveVersionOpen, setIsSaveVersionOpen] = useState(false);
+  const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] = useState(false);
 
   // Mock data - substituir por dados reais do backend
   const [agent, setAgent] = useState<{
@@ -84,12 +95,25 @@ export default function AgentDetails() {
   };
 
   const handleToggleStatus = () => {
-    const newStatus = agent.status === "active" ? "inactive" : "active";
-    setAgent({ ...agent, status: newStatus });
+    if (agent.status === "active") {
+      setIsDeactivateDialogOpen(true);
+    } else {
+      // Ativar diretamente sem modal
+      setAgent({ ...agent, status: "active" });
+      toast({
+        title: "Status atualizado",
+        description: "Agente ativado com sucesso.",
+      });
+    }
+  };
+
+  const handleConfirmDeactivate = () => {
+    setAgent({ ...agent, status: "inactive" });
     toast({
       title: "Status atualizado",
-      description: `Agente ${newStatus === "active" ? "ativado" : "desativado"} com sucesso.`,
+      description: "Agente desativado com sucesso. Esta ação foi registrada.",
     });
+    setIsDeactivateDialogOpen(false);
   };
 
   return (
@@ -205,6 +229,23 @@ export default function AgentDetails() {
         onOpenChange={setIsSaveVersionOpen}
         onSave={handleSave}
       />
+
+      <AlertDialog open={isDeactivateDialogOpen} onOpenChange={setIsDeactivateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza que deseja desativar este agente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação ficará registrada no sistema. O agente não poderá ser utilizado até ser reativado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDeactivate} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Desativar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
