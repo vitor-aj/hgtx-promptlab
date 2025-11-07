@@ -39,6 +39,11 @@ export default function TestPrompt() {
     }
   }, [messages]);
 
+  // Limpa a conversa ao trocar de agente
+  useEffect(() => {
+    setMessages([]);
+  }, [selectedAgent]);
+
   const handleSend = () => {
     if (!input.trim() || !selectedAgent) return;
 
