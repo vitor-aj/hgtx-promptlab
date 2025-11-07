@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 interface CreateAgentDialogProps {
   open: boolean;
@@ -23,19 +25,37 @@ interface CreateAgentDialogProps {
 }
 
 export function CreateAgentDialog({ open, onOpenChange }: CreateAgentDialogProps) {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [name, setName] = useState("");
-  const [status, setStatus] = useState<"active" | "inactive">("active");
-  const [selectedPrompt, setSelectedPrompt] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
 
-  const handleSave = () => {
-    console.log("Salvando agente:", { name, status, selectedPrompt, selectedModel });
-    // Implementar lógica de salvar no backend
+  const aiModels = [
+    { value: "google/gemini-2.5-pro", label: "Google Gemini 2.5 Pro" },
+    { value: "google/gemini-2.5-flash", label: "Google Gemini 2.5 Flash" },
+    { value: "google/gemini-2.5-flash-lite", label: "Google Gemini 2.5 Flash Lite" },
+    { value: "openai/gpt-5", label: "OpenAI GPT-5" },
+    { value: "openai/gpt-5-mini", label: "OpenAI GPT-5 Mini" },
+    { value: "openai/gpt-5-nano", label: "OpenAI GPT-5 Nano" },
+  ];
+
+  const handleCreate = () => {
+    // TODO: Implementar criação no backend
+    const newAgentId = Math.floor(Math.random() * 10000); // Gerar ID temporário
+    console.log("Criando agente:", { name, model: selectedModel });
+    
+    toast({
+      title: "Agente criado",
+      description: "O agente foi criado com sucesso.",
+    });
+
     onOpenChange(false);
+    
+    // Navegar para a tela de detalhes do novo agente
+    navigate(`/agents/${newAgentId}`);
+    
     // Reset form
     setName("");
-    setStatus("active");
-    setSelectedPrompt("");
     setSelectedModel("");
   };
 
@@ -45,7 +65,7 @@ export function CreateAgentDialog({ open, onOpenChange }: CreateAgentDialogProps
         <DialogHeader>
           <DialogTitle>Criar Novo Agente</DialogTitle>
           <DialogDescription>
-            Configure o agente selecionando um prompt e modelo de IA
+            Preencha os dados básicos do agente. Você poderá configurar o system prompt na próxima tela.
           </DialogDescription>
         </DialogHeader>
 
@@ -61,48 +81,17 @@ export function CreateAgentDialog({ open, onOpenChange }: CreateAgentDialogProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select value={status} onValueChange={(v) => setStatus(v as "active" | "inactive")}>
-              <SelectTrigger id="status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Ativo</SelectItem>
-                <SelectItem value="inactive">Inativo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="prompt">Prompt</Label>
-            <Select value={selectedPrompt} onValueChange={setSelectedPrompt}>
-              <SelectTrigger id="prompt">
-                <SelectValue placeholder="Selecione um prompt" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="atendimento">Prompt de Atendimento v2.1</SelectItem>
-                <SelectItem value="vendas">Prompt de Vendas v1.5</SelectItem>
-                <SelectItem value="analise">Prompt de Análise</SelectItem>
-                <SelectItem value="marketing">Prompt de Marketing</SelectItem>
-                <SelectItem value="suporte">Prompt de Suporte Técnico</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="model">Modelo de IA</Label>
             <Select value={selectedModel} onValueChange={setSelectedModel}>
               <SelectTrigger id="model">
                 <SelectValue placeholder="Selecione um modelo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gemini-2.5-flash">Google Gemini 2.5 Flash</SelectItem>
-                <SelectItem value="gemini-2.5-pro">Google Gemini 2.5 Pro</SelectItem>
-                <SelectItem value="gpt-5">OpenAI GPT-5</SelectItem>
-                <SelectItem value="gpt-5-mini">OpenAI GPT-5 Mini</SelectItem>
-                <SelectItem value="gpt-4.1">OpenAI GPT-4.1</SelectItem>
-                <SelectItem value="claude-sonnet-4-5">Anthropic Claude Sonnet 4.5</SelectItem>
-                <SelectItem value="claude-opus-4-1">Anthropic Claude Opus 4.1</SelectItem>
+                {aiModels.map((model) => (
+                  <SelectItem key={model.value} value={model.value}>
+                    {model.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -112,8 +101,8 @@ export function CreateAgentDialog({ open, onOpenChange }: CreateAgentDialogProps
               Cancelar
             </Button>
             <Button 
-              onClick={handleSave} 
-              disabled={!name || !selectedPrompt || !selectedModel}
+              onClick={handleCreate} 
+              disabled={!name || !selectedModel}
             >
               Criar Agente
             </Button>
