@@ -101,7 +101,19 @@ export default function AgentDetails() {
         </Button>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
+            <Badge 
+              variant={agent.status === "active" ? "default" : "secondary"}
+              className={
+                agent.status === "active" 
+                  ? "bg-green-600 hover:bg-green-700 text-white" 
+                  : "bg-muted text-muted-foreground"
+              }
+            >
+              {agent.status === "active" ? "● Ativo" : "○ Inativo"}
+            </Badge>
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-2">
             <Button 
@@ -115,7 +127,7 @@ export default function AgentDetails() {
             </Button>
             <Button 
               variant={agent.status === "active" ? "destructive" : "default"}
-              className="gap-2" 
+              className={agent.status === "active" ? "gap-2" : "gap-2 bg-green-600 hover:bg-green-700 text-white"}
               onClick={handleToggleStatus}
             >
               <Power className="h-4 w-4" />
