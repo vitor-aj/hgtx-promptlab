@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Bot, Save, History } from "lucide-react";
+import { ArrowLeft, Save, History, Power } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VersionHistoryDialog } from "@/components/agents/VersionHistoryDialog";
 
@@ -16,10 +16,16 @@ export default function AgentDetails() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   // Mock data - substituir por dados reais do backend
-  const [agent, setAgent] = useState({
+  const [agent, setAgent] = useState<{
+    id: string | undefined;
+    name: string;
+    status: "active" | "inactive";
+    model: string;
+    systemPrompt: string;
+  }>({
     id: id,
     name: "Agente de Atendimento",
-    status: "active" as const,
+    status: "active",
     model: "google/gemini-2.5-flash",
     systemPrompt: "Você é um assistente de atendimento ao cliente. Seja educado, prestativo e objetivo nas suas respostas. Sempre mantenha um tom profissional e cordial.",
   });
@@ -72,6 +78,15 @@ export default function AgentDetails() {
     });
   };
 
+  const handleToggleStatus = () => {
+    const newStatus = agent.status === "active" ? "inactive" : "active";
+    setAgent({ ...agent, status: newStatus });
+    toast({
+      title: "Status atualizado",
+      description: `Agente ${newStatus === "active" ? "ativado" : "desativado"} com sucesso.`,
+    });
+  };
+
   return (
     <div className="animate-fade-in pb-8">
       {/* Header */}
@@ -85,45 +100,36 @@ export default function AgentDetails() {
           Voltar para Agentes
         </Button>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start gap-4">
-            <div className="h-16 w-16 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Bot className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge 
-                  variant={agent.status === "active" ? "default" : "secondary"}
-                  className={
-                    agent.status === "active" 
-                      ? "bg-green-600 hover:bg-green-700" 
-                      : "bg-muted text-muted-foreground"
-                  }
-                >
-                  {agent.status === "active" ? "● Ativo" : "○ Inativo"}
-                </Badge>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
+          
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button className="gap-2 flex-1 sm:flex-initial" onClick={handleSave}>
-              <Save className="h-4 w-4" />
-              Salvar Alterações
-            </Button>
             <Button 
               variant="outline" 
-              className="gap-2 flex-1 sm:flex-initial" 
+              className="gap-2" 
               onClick={() => setIsHistoryOpen(true)}
             >
               <History className="h-4 w-4" />
-              Histórico de Versões
+              <span className="hidden sm:inline">Histórico de Versões</span>
+              <span className="sm:hidden">Histórico</span>
+            </Button>
+            <Button 
+              variant={agent.status === "active" ? "destructive" : "default"}
+              className="gap-2" 
+              onClick={handleToggleStatus}
+            >
+              <Power className="h-4 w-4" />
+              {agent.status === "active" ? "Desativar" : "Ativar"}
+            </Button>
+            <Button className="gap-2" onClick={handleSave}>
+              <Save className="h-4 w-4" />
+              Salvar Alterações
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="space-y-6 max-w-4xl">
+      <div className="space-y-6">
         {/* AI Model */}
         <Card>
           <CardHeader>
