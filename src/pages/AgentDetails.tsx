@@ -8,12 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Save, History, Power } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VersionHistoryDialog } from "@/components/agents/VersionHistoryDialog";
+import { SaveVersionDialog } from "@/components/agents/SaveVersionDialog";
 
 export default function AgentDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isSaveVersionOpen, setIsSaveVersionOpen] = useState(false);
 
   // Mock data - substituir por dados reais do backend
   const [agent, setAgent] = useState<{
@@ -72,12 +74,12 @@ export default function AgentDetails() {
     { value: "openai/gpt-5-nano", label: "OpenAI GPT-5 Nano" },
   ];
 
-  const handleSave = () => {
+  const handleSave = (versionType: "major" | "minor" | "patch", notes: string) => {
     // TODO: Implementar salvamento no backend
-    console.log("Saving agent:", agent);
+    console.log("Saving agent:", agent, "Version type:", versionType, "Notes:", notes);
     toast({
       title: "Agente atualizado",
-      description: "As alterações foram salvas com sucesso.",
+      description: `Nova versão ${versionType} salva com sucesso.`,
     });
   };
 
@@ -136,7 +138,7 @@ export default function AgentDetails() {
               <Power className="h-4 w-4" />
               {agent.status === "active" ? "Desativar" : "Ativar"}
             </Button>
-            <Button className="gap-2" onClick={handleSave}>
+            <Button className="gap-2" onClick={() => setIsSaveVersionOpen(true)}>
               <Save className="h-4 w-4" />
               Salvar Alterações
             </Button>
@@ -196,6 +198,12 @@ export default function AgentDetails() {
         onOpenChange={setIsHistoryOpen}
         agentName={agent.name}
         versions={versions}
+      />
+
+      <SaveVersionDialog
+        open={isSaveVersionOpen}
+        onOpenChange={setIsSaveVersionOpen}
+        onSave={handleSave}
       />
     </div>
   );
