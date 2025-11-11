@@ -224,7 +224,7 @@ export default function TestPrompt() {
                       e.stopPropagation();
                       handleDeleteConversation(conversation.id);
                     }}
-                    className="absolute right-2 top-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute right-2 top-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted/50"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
