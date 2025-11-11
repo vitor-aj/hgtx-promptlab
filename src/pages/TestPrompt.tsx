@@ -69,11 +69,6 @@ export default function TestPrompt() {
     }
   }, [messages]);
 
-  // Limpa a conversa ao trocar de agente
-  useEffect(() => {
-    handleNewConversation();
-  }, [selectedAgent]);
-
   const handleNewConversation = () => {
     if (!selectedAgent) return;
     
