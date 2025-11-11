@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User, RotateCcw, MessageSquare, Plus } from "lucide-react";
+import { Send, Bot, User, RotateCcw, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -188,32 +188,47 @@ export default function TestPrompt() {
               </div>
             ) : (
               conversations.map((conversation) => (
-                <button
+                <div
                   key={conversation.id}
-                  onClick={() => handleSelectConversation(conversation.id)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                  className={`group relative rounded-lg transition-colors ${
                     currentConversationId === conversation.id
                       ? "bg-primary/10 border border-primary/20"
                       : "hover:bg-muted"
                   }`}
                 >
-                  <div className="flex items-start gap-2">
-                    <MessageSquare className="h-4 w-4 mt-1 flex-shrink-0 text-muted-foreground" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {conversation.title}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                          {conversation.agentName}
-                        </span>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(conversation.createdAt).toLocaleDateString("pt-BR")}
+                  <button
+                    onClick={() => handleSelectConversation(conversation.id)}
+                    className="w-full text-left p-3"
+                  >
+                    <div className="flex items-start gap-2 pr-8">
+                      <MessageSquare className="h-4 w-4 mt-1 flex-shrink-0 text-muted-foreground" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {conversation.title}
                         </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                            {conversation.agentName}
+                          </span>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(conversation.createdAt).toLocaleDateString("pt-BR")}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteConversation(conversation.id);
+                    }}
+                    className="absolute right-2 top-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               ))
             )}
           </div>
