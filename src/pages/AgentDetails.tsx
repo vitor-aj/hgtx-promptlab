@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, History, Power } from "lucide-react";
+import { ArrowLeft, Save, History, Power, Pencil, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VersionHistoryDialog } from "@/components/agents/VersionHistoryDialog";
 import { SaveVersionDialog } from "@/components/agents/SaveVersionDialog";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +28,8 @@ export default function AgentDetails() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isSaveVersionOpen, setIsSaveVersionOpen] = useState(false);
   const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState("");
 
   // Mock data - substituir por dados reais do backend
   const [agent, setAgent] = useState<{
@@ -116,6 +119,27 @@ export default function AgentDetails() {
     setIsDeactivateDialogOpen(false);
   };
 
+  const handleStartEditName = () => {
+    setTempName(agent.name);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = () => {
+    if (tempName.trim()) {
+      setAgent({ ...agent, name: tempName.trim() });
+      setIsEditingName(false);
+      toast({
+        title: "Nome atualizado",
+        description: "O nome do agente foi alterado com sucesso.",
+      });
+    }
+  };
+
+  const handleCancelEditName = () => {
+    setIsEditingName(false);
+    setTempName("");
+  };
+
   return (
     <div className="animate-fade-in pb-8">
       {/* Header */}
@@ -131,7 +155,48 @@ export default function AgentDetails() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  className="text-2xl md:text-3xl font-bold h-auto py-1"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSaveName();
+                    if (e.key === "Escape") handleCancelEditName();
+                  }}
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 w-8 p-0"
+                  onClick={handleSaveName}
+                >
+                  <Check className="h-4 w-4 text-green-600" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 w-8 p-0"
+                  onClick={handleCancelEditName}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 w-8 p-0"
+                  onClick={handleStartEditName}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </>
+            )}
             <Badge 
               variant={agent.status === "active" ? "default" : "secondary"}
               className={
