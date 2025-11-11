@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User, RotateCcw } from "lucide-react";
+import { Send, Bot, User, RotateCcw, MessageSquare, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
 type Message = {
   id: string;
@@ -20,11 +21,23 @@ type Message = {
   content: string;
 };
 
+type Conversation = {
+  id: string;
+  agentId: string;
+  agentName: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export default function TestPrompt() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState("");
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -35,6 +48,21 @@ export default function TestPrompt() {
     { id: "3", name: "Agente de Análise" },
   ];
 
+  // Carrega conversas do localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("test_conversations");
+    if (stored) {
+      setConversations(JSON.parse(stored));
+    }
+  }, []);
+
+  // Salva conversas no localStorage
+  useEffect(() => {
+    if (conversations.length > 0) {
+      localStorage.setItem("test_conversations", JSON.stringify(conversations));
+    }
+  }, [conversations]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -43,8 +71,58 @@ export default function TestPrompt() {
 
   // Limpa a conversa ao trocar de agente
   useEffect(() => {
-    setMessages([]);
+    handleNewConversation();
   }, [selectedAgent]);
+
+  const handleNewConversation = () => {
+    if (!selectedAgent) return;
+    
+    const agent = agents.find((a) => a.id === selectedAgent);
+    const newConversation: Conversation = {
+      id: Date.now().toString(),
+      agentId: selectedAgent,
+      agentName: agent?.name || "Agente",
+      title: "Nova Conversa",
+      messages: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    setConversations((prev) => [newConversation, ...prev]);
+    setCurrentConversationId(newConversation.id);
+    setMessages([]);
+  };
+
+  const handleSelectConversation = (conversationId: string) => {
+    const conversation = conversations.find((c) => c.id === conversationId);
+    if (conversation) {
+      setCurrentConversationId(conversationId);
+      setSelectedAgent(conversation.agentId);
+      setMessages(conversation.messages);
+    }
+  };
+
+  const updateConversation = (newMessages: Message[]) => {
+    if (!currentConversationId) return;
+
+    setConversations((prev) =>
+      prev.map((conv) => {
+        if (conv.id === currentConversationId) {
+          const title =
+            newMessages.length > 0
+              ? newMessages[0].content.substring(0, 50) + "..."
+              : "Nova Conversa";
+          return {
+            ...conv,
+            messages: newMessages,
+            title,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return conv;
+      })
+    );
+  };
 
   const handleSend = () => {
     if (!input.trim() || !selectedAgent) return;
@@ -55,7 +133,9 @@ export default function TestPrompt() {
       content: input,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    updateConversation(newMessages);
     setInput("");
     setIsLoading(true);
 
@@ -66,7 +146,9 @@ export default function TestPrompt() {
         content:
           "Esta é uma resposta simulada do agente de IA. Em produção, esta resposta seria gerada pelo modelo de IA configurado no agente selecionado.",
       };
-      setMessages((prev) => [...prev, aiMessage]);
+      const finalMessages = [...newMessages, aiMessage];
+      setMessages(finalMessages);
+      updateConversation(finalMessages);
       setIsLoading(false);
     }, 1500);
   };
@@ -78,53 +160,116 @@ export default function TestPrompt() {
     }
   };
 
-  const handleClearChat = () => {
-    setMessages([]);
+  const handleDeleteConversation = (conversationId: string) => {
+    setConversations((prev) => prev.filter((c) => c.id !== conversationId));
+    if (currentConversationId === conversationId) {
+      setCurrentConversationId(null);
+      setMessages([]);
+    }
     toast({
-      title: "Conversa limpa",
-      description: "O histórico de mensagens foi limpo com sucesso.",
+      title: "Conversa excluída",
+      description: "A conversa foi removida com sucesso.",
     });
   };
 
   return (
-    <div className="animate-fade-in h-full flex flex-col max-w-5xl mx-auto">
-      <div className="mb-4 md:mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Testar Agente</h1>
-        <p className="text-sm md:text-base text-muted-foreground">
-          Converse com o agente para testar seu comportamento
-        </p>
-      </div>
-
-      <Card className="flex-1 flex flex-col overflow-hidden">
-        {/* Selector de Agente */}
+    <div className="animate-fade-in h-full flex gap-4">
+      {/* Sidebar com conversas anteriores */}
+      <Card className="w-80 flex-shrink-0 flex flex-col overflow-hidden">
         <div className="p-4 border-b border-border">
-          <div className="flex items-end justify-between gap-4">
-            <div className="flex-1">
-              <Label htmlFor="agent-select" className="mb-2 block">
-                Selecione o Agente
-              </Label>
-              <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-                <SelectTrigger id="agent-select">
-                  <SelectValue placeholder="Escolha um agente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {agents.map((agent) => (
-                    <SelectItem key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-foreground">Conversas</h2>
+            <Button
+              size="sm"
+              onClick={handleNewConversation}
+              disabled={!selectedAgent}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Nova
+            </Button>
+          </div>
+          <div>
+            <Label htmlFor="sidebar-agent-select" className="mb-2 block text-sm">
+              Agente
+            </Label>
+            <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+              <SelectTrigger id="sidebar-agent-select" className="h-9">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {agents.map((agent) => (
+                  <SelectItem key={agent.id} value={agent.id}>
+                    {agent.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-2 space-y-1">
+            {conversations
+              .filter((conv) => conv.agentId === selectedAgent)
+              .map((conversation) => (
+                <button
+                  key={conversation.id}
+                  onClick={() => handleSelectConversation(conversation.id)}
+                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                    currentConversationId === conversation.id
+                      ? "bg-primary/10 border border-primary/20"
+                      : "hover:bg-muted"
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <MessageSquare className="h-4 w-4 mt-1 flex-shrink-0 text-muted-foreground" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {conversation.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(conversation.createdAt).toLocaleDateString("pt-BR")}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            {selectedAgent && conversations.filter((c) => c.agentId === selectedAgent).length === 0 && (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                Nenhuma conversa ainda
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </Card>
+
+      {/* Área principal do chat */}
+      <Card className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">
+                {selectedAgent
+                  ? agents.find((a) => a.id === selectedAgent)?.name
+                  : "Testar Agente"}
+              </h1>
+              {currentConversationId && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Conversa atual
+                </p>
+              )}
             </div>
             <Button
               variant="outline"
-              size="default"
-              onClick={handleClearChat}
-              disabled={messages.length === 0}
+              size="sm"
+              onClick={handleNewConversation}
+              disabled={!selectedAgent}
               className="gap-2"
             >
-              <RotateCcw className="h-4 w-4" />
-              <span className="hidden sm:inline">Nova Conversa</span>
+              <Plus className="h-4 w-4" />
+              Nova Conversa
             </Button>
           </div>
         </div>
