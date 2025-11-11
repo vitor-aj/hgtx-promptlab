@@ -174,45 +174,20 @@ export default function TestPrompt() {
 
   return (
     <div className="animate-fade-in h-full flex gap-4">
-      {/* Sidebar com conversas anteriores */}
+      {/* Sidebar com todas as conversas */}
       <Card className="w-80 flex-shrink-0 flex flex-col overflow-hidden">
         <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-foreground">Conversas</h2>
-            <Button
-              size="sm"
-              onClick={handleNewConversation}
-              disabled={!selectedAgent}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Nova
-            </Button>
-          </div>
-          <div>
-            <Label htmlFor="sidebar-agent-select" className="mb-2 block text-sm">
-              Agente
-            </Label>
-            <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-              <SelectTrigger id="sidebar-agent-select" className="h-9">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                {agents.map((agent) => (
-                  <SelectItem key={agent.id} value={agent.id}>
-                    {agent.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <h2 className="font-semibold text-foreground">Histórico de Conversas</h2>
         </div>
 
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {conversations
-              .filter((conv) => conv.agentId === selectedAgent)
-              .map((conversation) => (
+            {conversations.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                Nenhuma conversa ainda
+              </div>
+            ) : (
+              conversations.map((conversation) => (
                 <button
                   key={conversation.id}
                   onClick={() => handleSelectConversation(conversation.id)}
@@ -228,17 +203,18 @@ export default function TestPrompt() {
                       <p className="text-sm font-medium text-foreground truncate">
                         {conversation.title}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(conversation.createdAt).toLocaleDateString("pt-BR")}
-                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                          {conversation.agentName}
+                        </span>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(conversation.createdAt).toLocaleDateString("pt-BR")}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </button>
-              ))}
-            {selectedAgent && conversations.filter((c) => c.agentId === selectedAgent).length === 0 && (
-              <div className="text-center py-8 text-muted-foreground text-sm">
-                Nenhuma conversa ainda
-              </div>
+              ))
             )}
           </div>
         </ScrollArea>
@@ -248,29 +224,34 @@ export default function TestPrompt() {
       <Card className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-semibold text-foreground">
-                {selectedAgent
-                  ? agents.find((a) => a.id === selectedAgent)?.name
-                  : "Testar Agente"}
-              </h1>
-              {currentConversationId && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Conversa atual
-                </p>
-              )}
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label htmlFor="agent-select" className="mb-2 block text-sm">
+                Selecione o Agente
+              </Label>
+              <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                <SelectTrigger id="agent-select">
+                  <SelectValue placeholder="Escolha um agente para conversar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {agents.map((agent) => (
+                    <SelectItem key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNewConversation}
-              disabled={!selectedAgent}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Nova Conversa
-            </Button>
+            <div className="pt-6">
+              <Button
+                onClick={handleNewConversation}
+                disabled={!selectedAgent}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Nova Conversa
+              </Button>
+            </div>
           </div>
         </div>
 
